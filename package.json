@@ -10,7 +10,12 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@notionhq/client": "^5.6.0"
+    "@google/genai": "^1.34.0",
+    "@mistralai/mistralai": "^1.11.0",
+    "@notionhq/client": "^5.6.0",
+    "csv-writer": "^1.6.0",
+    "dotenv": "^17.2.3",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "prettier": "^3.7.4"
