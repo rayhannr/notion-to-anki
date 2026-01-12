@@ -1,19 +1,34 @@
 import 'dotenv/config'
 import { createArrayCsvWriter as createCsvWriter } from 'csv-writer'
-import { Package } from 'anki-apkg-export'
+import pkg from 'anki-apkg-export'
+const AnkiExport = pkg.default || pkg
 import fs from 'fs'
-import { getFullBlockChildren, updateExampleToNotion } from './shared'
+import { getFullBlockChildren, updateExampleToNotion } from './shared.js'
 
 const parentPageId = process.env.NOTION_PAGE_ID
 
 async function generateAnkiPkg(cards) {
   console.log('\n📦 Packaging into .apkg...')
-  const apkg = new Package('Notion to Anki • Advanced Japanese N4', {
+  const apkg = new AnkiExport('Notion to Anki • Advanced Japanese N4', {
     css: `
-      .card { font-family: 'Helvetica', 'Arial', sans-serif; font-size: 20px; text-align: center; }
-      .kanji { font-size: 45px; margin-bottom: 20px; }
-      .back-container { text-align: left; display: inline-block; width: 90%; margin-top: 10px; border-top: 1px solid #ccc; padding-top: 10px; }
-    `
+    .card { 
+      font-family: "Helvetica", "Arial", sans-serif; 
+      font-size: 20px; 
+      text-align: center; 
+    }
+    .kanji { 
+      font-size: 45px; 
+      margin-bottom: 20px; 
+    }
+    .back-container { 
+      text-align: left; 
+      display: inline-block; 
+      width: 90%; 
+      margin-top: 10px; 
+      border-top: 1px solid #ccc; 
+      padding-top: 10px; 
+    }
+  `
   })
 
   cards.forEach((card) => {
@@ -77,7 +92,7 @@ async function crawlNotionToAnki() {
 
     const csvWriter = createCsvWriter({ path: 'notion_to_anki.csv', header: ['Front', 'Back'] })
     await csvWriter.writeRecords(allCards)
-    await generateAnkiPkg(allCards)
+    // await generateAnkiPkg(allCards)
     console.log(`\n✨ SUCCESS: ${allCards.length} cards exported.`)
   } catch (err) {
     console.error('Fatal Error:', err)

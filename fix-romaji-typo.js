@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import { Client } from '@notionhq/client'
 import { Mistral } from '@mistralai/mistralai'
-import { getFullBlockChildren, sleep } from './shared'
+import { getFullBlockChildren, sleep } from './shared.js'
 
 const notion = new Client({ auth: process.env.NOTION_API_KEY })
 const mistral = new Mistral({ apiKey: process.env.MISTRAL_API_KEY })

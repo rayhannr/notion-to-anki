@@ -105,7 +105,7 @@ export async function updateExampleToNotion({ row, kIdx, rIdx, mIdx, eIdx, force
   let exampleVal = cells[eIdx]?.map((n) => n.plain_text).join('') || ''
 
   if (!!exampleVal && !forceUpdate) {
-    console.log(`📝 Example for ${kanji} already exists: ${exampleVal}, skipping...`)
+    console.log(`📝 Example for ${kanji} already exists, skipping...`)
     return { exampleVal, kanji }
   }
 

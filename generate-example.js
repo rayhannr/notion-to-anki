@@ -1,5 +1,5 @@
 import 'dotenv/config'
-import { generateExample, getFullBlockChildren, updateExampleToNotion } from './shared'
+import { generateExample, getFullBlockChildren, updateExampleToNotion } from './shared.js'
 
 const parentPageId = process.env.NOTION_PAGE_ID
 
