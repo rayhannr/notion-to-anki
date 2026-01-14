@@ -1,47 +1,59 @@
-# Notion to Anki AI Bridge
+# Notion to Anki
 
-This project started with a simple problem: `Notion` tables are great for dumping new Japanese vocabulary, but they are not very effective for active recall. I found myself with hundreds of rows of words that were sitting unused because they were trapped in a table format. To solve this, I built a bridge that uses `Mistral AI` to transform those static tables into high quality study materials for `Anki`.
+This tool automates the creation of Japanese study materials by transforming **Notion Databases** into **Anki** cards using **Mistral AI**.
 
-The core of the system is a script that crawls a `Notion` workspace and finds all your vocabulary tables. Instead of just exporting the raw words, it uses an AI to generate natural Japanese sentences for every entry. These examples are formatted into three line snippets containing the Japanese sentence, its `romaji` reading, and the English meaning.
+It crawls your Notion workspace, pulls vocabulary from your databases, and generates natural Japanese sentences for every entry. These examples include the Japanese sentence, romaji reading, and English meaning, optimized for N4/N3 reading practice.
 
-Please note that this tool is designed for advanced learners. The generated example sentences range from 24 to 50 Japanese characters in length, which typically aligns with `N4` or `N3` level reading materials. Because of this high information density, the output might be challenging for complete beginners.
+## How it Works
 
-## The Journey of a Word
-
-The workflow is designed to be as simple as possible for a student. First, you add new words to your `Notion` tables as you encounter them. When you are ready to study, you run the main script.
-
-The main script iterates through your tables and checks for any entries without examples. When it finds one, it asks the AI to create a contextually relevant example sentence that matches your desired `JLPT` level and tone. Whether you want a formal news style report or a casual conversational dialogue, the system adjusts its output accordingly.
-
-Once the AI has finished enhancing your list, the project generates a `CSV` file and a packaged `Anki` deck. This deck is styled for readability and is ready to be imported directly into `Anki` for your daily review sessions.
+1. **Add Vocabulary**: Add new words to your Notion Databases.
+2. **Process**: Run the script to iterate through your databases. It identifies entries missing examples and uses Mistral AI to generate contextually relevant sentences based on your desired level and tone.
+3. **Export**: The tool generates a packaged **Anki deck (.apkg)** and a **CSV** file, styled and ready for immediate import.
 
 ## Setup and Requirements
 
-To get started, you will need to provide your API keys and the ID of your parent `Notion` page. Create a file named `.env` in the root directory with the following variables:
+### 1. Notion Database Structure
 
-`NOTION_API_KEY`: Your integration token from the `Notion` developer portal.
+Your databases must use these exact property names:
 
-`NOTION_PAGE_ID`: The ID of the page containing your vocabulary tables.
+- **Kanji** (Title property)
+- **Romaji** (Text)
+- **Meaning** (Text)
+- **Example** (Text)
 
-`MISTRAL_API_KEY`: Your API key from `Mistral AI`.
+### 2. Environment Variables
 
-After setting up your credentials, install the necessary dependencies by running:
+Create a `.env` file in the root directory:
 
-`npm install`
+```env
+NOTION_API_KEY=your_notion_integration_token
+NOTION_PAGE_ID=your_parent_page_id
+MISTRAL_API_KEY=your_mistral_api_key
+```
 
-## Running the Bridge
+### 3. Installation
 
-When you are ready to transform your `Notion` tables into an `Anki` deck, simply execute:
+```bash
+npm install
+```
 
-`node index.js`
+## Usage
 
-This will crawl your pages, generate any missing examples, and produce both `notion_to_anki.csv` and `NotionToAnki.apkg` in your project folder.
+To generate your cards, run:
 
-## Maintenance and Reference
+```bash
+node index.js
+```
 
-I have also included specialized scripts that I use for my own personal maintenance. While they are not part of the standard workflow, they are available in the repository as a reference for advanced users:
+This will produce `notion_to_anki2.csv` and `NotionToAnki.apkg`.
 
-`generate-example.js`: A utility script to bulk generate examples for an entire database.
+## Maintenance Tools
 
-`fix-romaji-typo.js`: A smart proofreader that synchronizes `romaji` with Japanese text and cleans up low quality examples.
+- `generate-example.js`: Bulk generate or override examples for an entire database.
+- `fix-romaji-typo.js`: AI proofreader to synchronize romaji and clean up sentence context.
+- `clean-examples.js`: Deduplicates entries and keeps only the most detailed sentences.
+- `convert-tables-to-databases.js`: Legacy utility to migrate old Notion "Simple Tables" into Databases.
 
-`clean-examples.js`: A script designed to deduplicate entries and keep only the most detailed sentences.
+---
+
+_Note: Examples range from 24-50 characters (N4/N3 level)._

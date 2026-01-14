@@ -3,7 +3,7 @@ import { createArrayCsvWriter as createCsvWriter } from 'csv-writer'
 import pkg from 'anki-apkg-export'
 const AnkiExport = pkg.default || pkg
 import fs from 'fs'
-import { getFullBlockChildren, updateExampleToNotion } from './shared.js'
+import { getDatabaseRows, getFullBlockChildren, updateExampleToNotion } from './shared.js'
 
 const parentPageId = process.env.NOTION_PAGE_ID
 
@@ -50,38 +50,27 @@ async function crawlNotionToAnki() {
 
     for (const page of subpages) {
       if (page.type !== 'child_page' || page.child_page?.title === 'notes') continue
-      const pageTitle = page.child_page.title
 
-      console.log(`\n📄 Processing Page: ${pageTitle}`)
       const content = await getFullBlockChildren(page.id)
-      const tables = content.filter((b) => b.type === 'table')
+      const databases = content.filter((b) => b.type === 'child_database')
 
-      for (const table of tables) {
-        const rows = await getFullBlockChildren(table.id)
-        const tableRows = rows.filter((r) => r.type === 'table_row')
-        if (tableRows.length < 2) continue
+      for (const db of databases) {
+        const pages = await getDatabaseRows(db.id)
+        const pageTitle = page.child_page.title
+        console.log(`\n📄 Processing Page: ${pageTitle} with ${pages.length} rows`)
+        if (pages.length === 0) continue
 
-        const originalHeaders = tableRows[0].table_row.cells.map((c) => c.map((n) => n.plain_text).join(''))
-        const headLower = originalHeaders.map((h) => h.toLowerCase())
+        for (const row of pages) {
+          const { exampleVal, kanji } = await updateExampleToNotion({ row, forceUpdate: false })
 
-        const kIdx = headLower.findIndex((h) => h.includes('kanji') || h.includes('front') || h === 'word')
-        const rIdx = headLower.findIndex((h) => h.includes('romaji') || h.includes('reading'))
-        const mIdx = headLower.findIndex((h) => h.includes('meaning') || h.includes('english'))
-        const eIdx = headLower.findIndex((h) => h.includes('example'))
+          if (!kanji) continue
 
-        if (kIdx === -1 || eIdx === -1) continue
-
-        const bodyRows = tableRows.slice(1)
-        for (const row of bodyRows) {
-          const { exampleVal, kanji } = updateExampleToNotion({ row, kIdx, rIdx, mIdx, eIdx, forceUpdate: false })
-
-          // CSV BACK SIDE FORMATTING
-          const back = row.table_row.cells
-            .map((cell, idx) => {
-              let hName = originalHeaders[idx]
-              if (hName.toLowerCase() === 'kanji') hName = 'Word/Phrase'
-              const val = idx === eIdx ? exampleVal : cell.map((n) => n.plain_text).join('')
-              return `<b>${hName}</b>: ${val}`
+          const back = Object.keys(row)
+            .filter((k) => k !== 'id')
+            .map((pName) => {
+              let hName = pName === 'Kanji' ? 'Word/Phrase' : pName
+              const val = pName === 'Example' ? exampleVal : row[pName] || ''
+              return `${hName}: ${val}`
             })
             .join('<br>')
 
@@ -90,10 +79,10 @@ async function crawlNotionToAnki() {
       }
     }
 
-    const csvWriter = createCsvWriter({ path: 'notion_to_anki.csv', header: ['Front', 'Back'] })
+    const csvWriter = createCsvWriter({ path: 'notion_to_anki2.csv', header: ['Front', 'Back'] })
     await csvWriter.writeRecords(allCards)
     // await generateAnkiPkg(allCards)
-    console.log(`\n✨ SUCCESS: ${allCards.length} cards exported.`)
+    console.log(`\n✨ SUCCESS: ${allCards.length} cards collected.`)
   } catch (err) {
     console.error('Fatal Error:', err)
   }

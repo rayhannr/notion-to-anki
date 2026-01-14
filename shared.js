@@ -16,6 +16,39 @@ export async function getFullBlockChildren(blockId) {
   return allResults
 }
 
+export async function getDatabaseRows(databaseId) {
+  let results = []
+  let cursor = undefined
+
+  while (true) {
+    const response = await notion.databases.retrieve({
+      database_id: databaseId
+    })
+    const dataSource = await notion.dataSources.query({
+      data_source_id: response.data_sources[0].id,
+      result_type: 'page',
+      start_cursor: cursor
+    })
+    const data = dataSource.results.map((result) => {
+      const simplified = Object.keys(result.properties).reduce((acc, curr) => {
+        const prop = result.properties[curr]
+        if (prop.type === 'rich_text') {
+          acc[curr] = prop.rich_text.map((n) => n.plain_text).join('')
+        } else if (prop.type === 'title') {
+          acc[curr] = prop.title.map((n) => n.plain_text).join('')
+        }
+        return acc
+      }, {})
+      return { id: result.id, ...simplified }
+    })
+
+    results.push(...data)
+    if (!dataSource.has_more) break
+    cursor = dataSource.next_cursor
+  }
+  return results
+}
+
 export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 const mistral = new Mistral({ apiKey: process.env.MISTRAL_API_KEY })
@@ -59,10 +92,11 @@ export async function generateExample(kanji, romaji, meaning, currentExample, mo
           1. TRANSFORM: Convert simple sentences into high-density Dokkai (reading) snippets.
           2. ${levelInstruction}
           3. ${toneInstruction}
-          4. ANTI-SIMPLICITY: Avoid "A is B" or simple "I do X" sentences. Use relative clauses and conjunctions.
-          5. LENGTH: Strictly ${MIN_LENGTH} to ${MAX_LENGTH} Japanese characters.
-          6. ANTI-LAZY: No rain/ame (雨) context unless the target word is actually rain.
-          7. CURATE: Keep exactly 2 unique, high-quality examples if possible.
+          4. LANGUAGE: You can use English or Indonesian to translate the example. Each example is translated once. If you have translated to English, don't translate it again to Indonesian.
+          5. ANTI-SIMPLICITY: Avoid "A is B" or simple "I do X" sentences. Use relative clauses and conjunctions.
+          6. LENGTH: Strictly ${MIN_LENGTH} to ${MAX_LENGTH} Japanese characters.
+          7. ANTI-LAZY: No rain/ame (雨) context unless the target word is actually rain.
+          8. CURATE: Keep exactly 2 unique, high-quality examples if possible.
           
           FORMAT:
           - Exactly 3 lines per example:
@@ -97,12 +131,11 @@ export async function generateExample(kanji, romaji, meaning, currentExample, mo
   }
 }
 
-export async function updateExampleToNotion({ row, kIdx, rIdx, mIdx, eIdx, forceUpdate }) {
-  const cells = row.table_row.cells
-  const kanji = cells[kIdx]?.map((n) => n.plain_text).join('') || ''
-  const romaji = cells[rIdx]?.map((n) => n.plain_text).join('') || ''
-  const meaning = cells[mIdx]?.map((n) => n.plain_text).join('') || ''
-  let exampleVal = cells[eIdx]?.map((n) => n.plain_text).join('') || ''
+export async function updateExampleToNotion({ row, forceUpdate }) {
+  const kanji = row.Kanji || ''
+  const romaji = row.Romaji || ''
+  const meaning = row.Meaning || ''
+  let exampleVal = row.Example || ''
 
   if (!!exampleVal && !forceUpdate) {
     console.log(`📝 Example for ${kanji} already exists, skipping...`)
@@ -122,9 +155,14 @@ export async function updateExampleToNotion({ row, kIdx, rIdx, mIdx, eIdx, force
 
   if (fixedText && fixedText !== exampleVal) {
     try {
-      const updatedCells = [...cells]
-      updatedCells[eIdx] = [{ type: 'text', text: { content: fixedText } }]
-      await notion.blocks.update({ block_id: row.id, table_row: { cells: updatedCells } })
+      await notion.pages.update({
+        page_id: row.id,
+        properties: {
+          Example: {
+            rich_text: [{ type: 'text', text: { content: fixedText } }]
+          }
+        }
+      })
       exampleVal = fixedText
       console.log(`   ✅ Notion Updated.`)
       await sleep(1000)

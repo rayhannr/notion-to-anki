@@ -1,5 +1,5 @@
 import 'dotenv/config'
-import { generateExample, getFullBlockChildren, updateExampleToNotion } from './shared.js'
+import { getFullBlockChildren, updateExampleToNotion, getDatabaseRows } from './shared.js'
 
 const parentPageId = process.env.NOTION_PAGE_ID
 
@@ -19,26 +19,14 @@ async function main() {
 
       console.log(`\n📄 Processing Page: ${pageTitle}`)
       const content = await getFullBlockChildren(page.id)
-      const tables = content.filter((b) => b.type === 'table')
+      const databases = content.filter((b) => b.type === 'child_database')
 
-      for (const table of tables) {
-        const rows = await getFullBlockChildren(table.id)
-        const tableRows = rows.filter((r) => r.type === 'table_row')
-        if (tableRows.length < 2) continue
+      for (const db of databases) {
+        const pages = await getDatabaseRows(db.id)
+        if (pages.length === 0) continue
 
-        const originalHeaders = tableRows[0].table_row.cells.map((c) => c.map((n) => n.plain_text).join(''))
-        const headLower = originalHeaders.map((h) => h.toLowerCase())
-
-        const kIdx = headLower.findIndex((h) => h.includes('kanji') || h.includes('front') || h === 'word')
-        const rIdx = headLower.findIndex((h) => h.includes('romaji') || h.includes('reading'))
-        const mIdx = headLower.findIndex((h) => h.includes('meaning') || h.includes('english'))
-        const eIdx = headLower.findIndex((h) => h.includes('example'))
-
-        if (kIdx === -1 || eIdx === -1) continue
-
-        const bodyRows = tableRows.slice(1)
-        for (const row of bodyRows) {
-          updateExampleToNotion({ row, kIdx, rIdx, mIdx, eIdx, forceUpdate: true })
+        for (const row of pages) {
+          await updateExampleToNotion({ row, forceUpdate: true })
         }
       }
     }

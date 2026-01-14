@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import { Client } from '@notionhq/client'
 import { Mistral } from '@mistralai/mistralai'
-import { getFullBlockChildren, sleep } from './shared.js'
+import { getFullBlockChildren, sleep, getDatabaseRows } from './shared.js'
 
 const notion = new Client({ auth: process.env.NOTION_API_KEY })
 const mistral = new Mistral({ apiKey: process.env.MISTRAL_API_KEY })
@@ -71,37 +71,19 @@ async function startSmartCleanup() {
     for (const page of subpages) {
       if (page.type !== 'child_page' || page.child_page?.title === 'notes') continue
 
-      const pageTitle = page.child_page.title.toLowerCase()
-
       console.log(`\n📄 Page: ${page.child_page.title}`)
       const content = await getFullBlockChildren(page.id)
-      const tables = content.filter((b) => b.type === 'table')
+      const databases = content.filter((b) => b.type === 'child_database')
 
-      for (const table of tables) {
-        const rows = await getFullBlockChildren(table.id)
-        const tableRows = rows.filter((r) => r.type === 'table_row')
-        if (tableRows.length < 2) continue
+      for (const db of databases) {
+        const pages = await getDatabaseRows(db.id)
+        if (pages.length === 0) continue
 
-        const headCells = tableRows[0].table_row.cells.map((c) =>
-          c
-            .map((n) => n.plain_text)
-            .join('')
-            .toLowerCase()
-        )
-        const kIdx = headCells.findIndex((h) => h.includes('kanji') || h.includes('front') || h === 'word')
-        const rIdx = headCells.findIndex((h) => h.includes('romaji') || h.includes('reading'))
-        const mIdx = headCells.findIndex((h) => h.includes('meaning') || h.includes('english'))
-        const eIdx = headCells.findIndex((h) => h.includes('example'))
-
-        if (kIdx === -1 || rIdx === -1 || eIdx === -1) continue
-
-        const bodyRows = tableRows.slice(1)
-        for (const row of bodyRows) {
-          const cells = row.table_row.cells
-          const kanji = cells[kIdx]?.map((n) => n.plain_text).join('') || ''
-          const romaji = cells[rIdx]?.map((n) => n.plain_text).join('') || ''
-          const meaning = cells[mIdx]?.map((n) => n.plain_text).join('') || ''
-          const currentExample = cells[eIdx]?.map((n) => n.plain_text).join('') || ''
+        for (const row of pages) {
+          const kanji = row.Kanji || ''
+          const romaji = row.Romaji || ''
+          const meaning = row.Meaning || ''
+          const currentExample = row.Example || ''
 
           if (currentExample.length > 5) {
             console.log(`🔍 Checking: [${kanji}]`)
@@ -109,9 +91,14 @@ async function startSmartCleanup() {
 
             if (fixedText && fixedText !== currentExample) {
               try {
-                const updatedCells = [...cells]
-                updatedCells[eIdx] = [{ type: 'text', text: { content: fixedText } }]
-                await notion.blocks.update({ block_id: row.id, table_row: { cells: updatedCells } })
+                await notion.pages.update({
+                  page_id: row.id,
+                  properties: {
+                    Example: {
+                      rich_text: [{ type: 'text', text: { content: fixedText } }]
+                    }
+                  }
+                })
                 console.log(`   ✅ Optimized (Kept 2 longest, if any).`)
                 await sleep(500)
               } catch (err) {
