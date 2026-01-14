@@ -148,7 +148,7 @@ export async function updateExampleToNotion({ row, forceUpdate }) {
   if (randMode < 0.08) mode = 'hard'
   else if (randMode < 0.18) mode = 'easy'
   let style = 'conversational'
-  if (randStyle < 0.5) style = 'formal'
+  if (randStyle < 0.4) style = 'formal'
   console.log(`🛠️ Processing [${kanji}]: ${mode} ${style}`)
 
   const fixedText = await generateExample(kanji, romaji, meaning, exampleVal, mode, style)
