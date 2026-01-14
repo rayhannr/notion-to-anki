@@ -1,26 +1,39 @@
 import genanki
+import csv
+import os
 import sys
-import json
 
-def sanitize_string(s):
-    """Remove lone surrogate characters that can't be encoded to UTF-8."""
-    if not isinstance(s, str):
-        return s
-    return s.encode('utf-8', 'ignore').decode('utf-8')
+# Fix Windows encoding for emoji output
+sys.stdout.reconfigure(encoding='utf-8')
 
-def create_apkg(cards):
-    model_id = 1607392319
-    deck_id = 2059400110
+def create_anki_from_csv(csv_path):
+    # Fixed IDs to prevent duplicate decks in Anki
+    MODEL_ID = 1607392319
+    DECK_ID = 2059400110
 
+    # Styling for the cards
     style = """
-    .card { font-family: "Helvetica", "Arial", sans-serif; font-size: 20px; text-align: center; }
-    .front { font-size: 45px; margin-bottom: 20px; }
-    .back-container { text-align: left; display: inline-block; width: 90%; margin-top: 10px; border-top: 1px solid #ccc; padding-top: 10px; }
+    .card { 
+        font-family: "Helvetica", "Arial", sans-serif; 
+        font-size: 20px; 
+        text-align: center; 
+        color: #2c3e50;
+    }
+    .front { font-size: 45px; margin-bottom: 20px; font-weight: bold; }
+    .back-container { 
+        text-align: left; 
+        display: inline-block; 
+        width: 90%; 
+        margin-top: 10px; 
+        border-top: 1px solid #ccc; 
+        padding-top: 10px; 
+    }
     """
 
+    # Define the Card Model
     my_model = genanki.Model(
-        model_id,
-        'Notion Advanced Model',
+        MODEL_ID,
+        'Notion CSV Model',
         fields=[{'name': 'Front'}, {'name': 'Back'}],
         templates=[{
             'name': 'Card 1',
@@ -30,14 +43,38 @@ def create_apkg(cards):
         css=style
     )
 
-    my_deck = genanki.Deck(deck_id, 'Notion to Anki • Japanese N4+')
+    my_deck = genanki.Deck(DECK_ID, 'Notion to Anki • Japanese N4+')
 
-    for card in cards:
-        note = genanki.Note(model=my_model, fields=[sanitize_string(card[0]), sanitize_string(card[1])])
-        my_deck.add_note(note)
+    if not os.path.exists(csv_path):
+        print(f"Error: File '{csv_path}' not found!")
+        return
 
-    genanki.Package(my_deck).write_to_file('NotionToAnki.apkg')
+    print(f"Reading data from {csv_path}...")
+    
+    # 'errors=ignore' handles the \udc81 ghost characters by stripping them out
+    try:
+        with open(csv_path, mode='r', encoding='utf-8', errors='ignore') as f:
+            reader = csv.reader(f)
+            # Skip CSV header
+            header = next(reader, None) 
+            
+            card_count = 0
+            for row in reader:
+                if len(row) < 2:
+                    continue
+                
+                # row[0] = Front/Kanji, row[1] = Back/HTML
+                note = genanki.Note(model=my_model, fields=[row[0], row[1]])
+                my_deck.add_note(note)
+                card_count += 1
+
+        # Generate the .apkg file
+        output_file = 'NotionToAnki.apkg'
+        genanki.Package(my_deck).write_to_file(output_file)
+        print(f"✨ SUCCESS: {card_count} notes packaged into {output_file}")
+
+    except Exception as e:
+        print(f"Fatal Error during packaging: {e}")
 
 if __name__ == "__main__":
-    data = json.loads(sys.stdin.read())
-    create_apkg(data)
+    create_anki_from_csv('notion_to_anki.csv')

@@ -1,33 +1,26 @@
 import 'dotenv/config'
 import { createArrayCsvWriter as createCsvWriter } from 'csv-writer'
-import fs from 'fs'
+import { exec } from 'child_process'
 import { getDatabaseRows, getFullBlockChildren, updateExampleToNotion } from './shared.js'
 
 const parentPageId = process.env.NOTION_PAGE_ID
 
-import { spawn } from 'child_process'
-
-async function generateAnkiPkg(cards) {
+async function generateAnkiPkg() {
   return new Promise((resolve, reject) => {
-    console.log('\n📦 Packaging into .apkg via Python Genanki...')
+    console.log('📦 Starting Python Anki generator...')
 
-    const python = spawn('python', ['generate-anki.py'])
-    python.stdin.write(JSON.stringify(cards))
-    python.stdin.end()
-
-    python.stdout.on('data', (data) => console.log(`Python: ${data}`))
-
-    python.stderr.on('data', (data) => {
-      console.error(`Python Error: ${data}`)
-    })
-
-    python.on('close', (code) => {
-      if (code === 0) {
-        console.log('✨ SUCCESS: NotionToAnki.apkg created via Genanki!')
-        resolve()
-      } else {
-        reject(new Error(`Python process exited with code ${code}`))
+    // Run the python script
+    exec('python generate-anki.py', (error, stdout, stderr) => {
+      if (error) {
+        console.error(`❌ Python Exec Error: ${error.message}`)
+        return reject(error)
       }
+      if (stderr) {
+        console.error(`⚠️ Python Stderr: ${stderr}`)
+      }
+
+      console.log(`🐍 Python Output: ${stdout.trim()}`)
+      resolve()
     })
   })
 }
@@ -56,14 +49,24 @@ async function crawlNotionToAnki() {
 
           if (!kanji) continue
 
-          const back = Object.keys(row)
-            .filter((k) => k !== 'id')
-            .map((pName) => {
-              let hName = pName === 'Kanji' ? '' : `${pName}:`
-              const val = pName === 'Example' ? exampleVal : row[pName] || ''
-              return `${hName} ${val}`
+          const backParts = []
+
+          if (row['Kanji']) {
+            backParts.push(row['Kanji'])
+          }
+
+          Object.keys(row)
+            .filter((k) => k !== 'id' && k !== 'Example' && k !== 'Kanji')
+            .forEach((columnName) => {
+              const val = row[columnName] || ''
+              backParts.push(`${columnName}: ${val}`)
             })
-            .join('<br>')
+
+          if (exampleVal) {
+            backParts.push(exampleVal)
+          }
+
+          const back = backParts.join('<br>')
 
           allCards.push([kanji, back])
         }

@@ -1,14 +1,24 @@
 # Notion to Anki
 
-This tool automates the creation of Japanese study materials by transforming **Notion Databases** into **Anki** cards using **Mistral AI**.
+This tool automates the creation of Japanese study materials by transforming **Notion Databases** into **Anki** cards using **Mistral AI** and **genanki**.
 
-It crawls your Notion workspace, pulls vocabulary from your databases, and generates natural Japanese sentences for every entry. These examples include the Japanese sentence, romaji reading, and English meaning, optimized for N4/N3 reading practice.
+It crawls your Notion workspace, pulls vocabulary from your databases, and generates natural Japanese sentences for every entry. These examples include the Japanese sentence, romaji reading, and English/Indonesian meaning, optimized for N4/N3 reading practice. The tool uses a Python script with genanki to package the cards into a ready-to-import `.apkg` file.
 
 ## How it Works
 
 1. **Add Vocabulary**: Add new words to your Notion Databases.
 2. **Process**: Run the script to iterate through your databases. It identifies entries missing examples and uses Mistral AI to generate contextually relevant sentences based on your desired level and tone.
-3. **Export**: The tool generates a packaged **Anki deck (.apkg)** and a **CSV** file, styled and ready for immediate import.
+3. **Export**: The tool generates a **CSV** file and uses Python's genanki library to package it into an **Anki deck (.apkg)**, styled and ready for immediate import.
+
+### Card Format
+
+Each Anki card is structured as follows:
+
+- **Front**: The word/phrase
+- **Back**: Properties in order:
+  1. Word (no label)
+  2. Other properties like Meaning (with labels)
+  3. AI-generated Example sentence (no label)
 
 ## Setup and Requirements
 
@@ -33,8 +43,16 @@ MISTRAL_API_KEY=your_mistral_api_key
 
 ### 3. Installation
 
+Install Node.js dependencies:
+
 ```bash
 npm install
+```
+
+Install Python dependencies:
+
+```bash
+pip install genanki
 ```
 
 ## Usage
@@ -45,7 +63,11 @@ To generate your cards, run:
 node index.js
 ```
 
-This will produce `notion_to_anki2.csv` and `NotionToAnki.apkg`.
+This will:
+
+1. Crawl your Notion databases and generate examples using Mistral AI
+2. Create `notion_to_anki.csv` with all card data
+3. Run `generate-anki.py` to package the CSV into `NotionToAnki.apkg`
 
 ## Maintenance Tools
 
