@@ -2,6 +2,7 @@ import genanki
 import csv
 import os
 import sys
+import html
 
 # Fix Windows encoding for emoji output
 sys.stdout.reconfigure(encoding='utf-8')
@@ -24,9 +25,9 @@ def create_anki_from_csv(csv_path):
         text-align: left; 
         display: inline-block; 
         width: 90%; 
-        margin-top: 10px; 
-        border-top: 1px solid #ccc; 
-        padding-top: 10px; 
+        margin-top: 10px;
+        white-space: pre-line;
+        line-height: 1.6;
     }
     """
 
@@ -63,8 +64,15 @@ def create_anki_from_csv(csv_path):
                 if len(row) < 2:
                     continue
                 
-                # row[0] = Front/Kanji, row[1] = Back/HTML
-                note = genanki.Note(model=my_model, fields=[row[0], row[1]])
+                front = row[0]
+                back = row[1]
+                
+                # Fix HTML: unescape any escaped HTML entities (&lt;br&gt; -> <br>)
+                # and convert actual newlines to <br> tags
+                back = html.unescape(back)
+                back = back.replace('\n', '<br>')
+                
+                note = genanki.Note(model=my_model, fields=[front, back])
                 my_deck.add_note(note)
                 card_count += 1
 

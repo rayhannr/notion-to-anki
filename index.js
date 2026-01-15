@@ -76,7 +76,6 @@ async function crawlNotionToAnki() {
     const csvWriter = createCsvWriter({ path: 'notion_to_anki.csv', header: ['Front', 'Back'] })
     await csvWriter.writeRecords(allCards)
     await generateAnkiPkg(allCards)
-    console.log(`\n✨ SUCCESS: ${allCards.length} cards collected.`)
   } catch (err) {
     console.error('Fatal Error:', err)
   }
