@@ -54,7 +54,7 @@ export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 const mistral = new Mistral({ apiKey: process.env.MISTRAL_API_KEY })
 export const notion = new Client({ auth: process.env.NOTION_API_KEY })
 export const MIN_LENGTH = 24
-export const MAX_LENGTH = 50
+export const MAX_LENGTH = 45
 
 export async function generateExample(kanji, romaji, meaning, currentExample, mode, style) {
   // Enhanced instructions to force complex clause structures
@@ -94,7 +94,7 @@ export async function generateExample(kanji, romaji, meaning, currentExample, mo
           3. ${toneInstruction}
           4. LANGUAGE: You can use English or Indonesian to translate the example. Each example is translated once. If you have translated to English, don't translate it again to Indonesian.
           5. ANTI-SIMPLICITY: Avoid "A is B" or simple "I do X" sentences. Use relative clauses and conjunctions.
-          6. LENGTH: Strictly ${MIN_LENGTH} to ${MAX_LENGTH} Japanese characters.
+          6. LENGTH: Strictly ${MIN_LENGTH} to ${MAX_LENGTH} Japanese characters. We don't take punctuation into account to count the length. 
           7. ANTI-LAZY: No rain/ame (雨) context unless the target word is actually rain.
           8. CURATE: Keep exactly 2 unique, high-quality examples if possible.
           
@@ -146,9 +146,9 @@ export async function updateExampleToNotion({ row, forceUpdate }) {
   const randStyle = Math.random()
   let mode = 'standard'
   if (randMode < 0.08) mode = 'hard'
-  else if (randMode < 0.18) mode = 'easy'
+  else if (randMode < 0.3) mode = 'easy'
   let style = 'conversational'
-  if (randStyle < 0.4) style = 'formal'
+  if (randStyle < 0.38) style = 'formal'
   console.log(`🛠️ Processing [${kanji}]: ${mode} ${style}`)
 
   const fixedText = await generateExample(kanji, romaji, meaning, exampleVal, mode, style)
@@ -165,7 +165,7 @@ export async function updateExampleToNotion({ row, forceUpdate }) {
       })
       exampleVal = fixedText
       console.log(`   ✅ Notion Updated.`)
-      await sleep(1000)
+      await sleep(1200)
     } catch (err) {
       console.log(`   ❌ Notion Update Error.`)
     }
