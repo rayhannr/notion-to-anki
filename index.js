@@ -47,7 +47,7 @@ async function crawlNotionToAnki() {
         for (const row of pages) {
           const { exampleVal, kanji } = await updateExampleToNotion({ row, forceUpdate: false })
 
-          if (!kanji) continue
+          if (!kanji || !exampleVal) continue
 
           const backParts = []
 

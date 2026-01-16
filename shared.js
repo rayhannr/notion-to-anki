@@ -112,7 +112,9 @@ export async function generateExample(kanji, romaji, meaning, currentExample, mo
         },
         {
           role: 'user',
-          content: `Input to transform: "${currentExample || 'EMPTY'}"`
+          content: currentExample
+            ? `Input to transform: "${currentExample}"`
+            : 'No existing example. Generate new high-quality examples from scratch.'
         }
       ],
       temperature: 0.4 // Slightly higher for more varied vocabulary
@@ -148,7 +150,7 @@ export async function updateExampleToNotion({ row, forceUpdate }) {
   if (randMode < 0.08) mode = 'hard'
   else if (randMode < 0.3) mode = 'easy'
   let style = 'conversational'
-  if (randStyle < 0.38) style = 'formal'
+  if (randStyle < 0.4) style = 'formal'
   console.log(`🛠️ Processing [${kanji}]: ${mode} ${style}`)
 
   const fixedText = await generateExample(kanji, romaji, meaning, exampleVal, mode, style)
