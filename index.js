@@ -63,6 +63,9 @@ async function crawlNotionToAnki() {
             })
 
           if (exampleVal) {
+            if (backParts.length > 0) {
+              backParts.push('')
+            }
             backParts.push(exampleVal)
           }
 
