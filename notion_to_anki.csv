@@ -180,7 +180,7 @@ uchūsen no enjin oto ga tomari, seishi jōtai ni natta no o kakunin shite kara,
 工場で働く時、機械のアームが静止してるかどうか、必ず目でチェックしないと危ないよ。
 kōjō de hataraku toki, kikai no āmu ga seishi teru ka dō ka, kanarazu me de chekku shinai to abunai yo.
 (When working in a factory, you have to visually confirm whether the robotic arm is completely still—otherwise it’s dangerous.)"
-連携,"連携<br>Meaning: collaboration, alignment<br>Romaji: renkei<br><br>企業と大学が協力して、AI技術の研究を進めてるけど、
+連携,"連携<br>Meaning: collaboration<br>Romaji: renkei<br><br>企業と大学が協力して、AI技術の研究を進めてるけど、
 これがまさに産学連携の良い例なんじゃない？
 kigyō to daigaku ga kyōryoku shite, AI gijutsu no kenkyū o susumeteru kedo, kore ga masani san-gaku renkei no ii rei nan ja nai?
 (Kerjasama perusahaan dan universitas dalam mengembangkan riset teknologi AI,
@@ -481,7 +481,7 @@ hikouki ga kasshouru ni mukatte kouka o hajimeru to, pairotto wa chakuriku no ta
 
 悪天候で視界が悪くても、着陸直前の数秒間に集中力を切らせば、安全なタッチダウンは難しい。
 akutenkou de shikai ga warukute mo, chakuriku chokuzen no suubyoukan ni shuuchuuryoku o kiraseba, anzen na tacchidaun wa muzukashii."
-整理,"整理<br>Meaning: mengatur<br>Romaji: seiri<br><br>部屋が散らかっていると集中できないから、まずは本棚の本や書類を整理して、
+整理,"整理<br>Meaning: organize<br>Romaji: seiri<br><br>部屋が散らかっていると集中できないから、まずは本棚の本や書類を整理して、
 片付けながら新しいプロジェクトのアイデアも整理しなきゃ。
 heya ga chirakatte iru to shūchū dekinai kara, mazu wa hondana no hon ya shorui o seiri shite, katazukenagara atarashī purojekuto no aidea mo seiri shi nakya.
 (Because I can't focus when my room is messy, first I'll organize the books and documents on the bookshelf, and while tidying up, I need to sort out my ideas for the new project too.)
@@ -770,15 +770,11 @@ Shokuhin kōjō ga saishin no kakō gijutsu o dōnyū shita kekka, haikibutsu no
 Kin’nen, SNS-jō de kado ni kakō sareta gazō ga zōka shi, genjitsu to no gyappu kara wakamono no jiko kōteikan ni eikyō o ataete iru to iu shiteki mo aru.
 (In recent years, there has been criticism that the rise of excessively edited images on social media is affecting young people’s self-esteem due to the gap with reality.)"
 両替,"両替<br>Meaning: exchange (currency)<br>Romaji: ryougae<br><br>空港へ向かう前に、現地で使える通貨への両替を銀行で行っておけば、到着後の手間が省けると言われている。
-
 kūkō e mukau mae ni, genchi de tsukaeru tsūka e no ryōgae o ginkō de okonatte okeba, tchaku-go no teama ga habikeru to iwarete iru.
-
 (It is said that exchanging currency for local use at a bank before heading to the airport can save you trouble after arrival.)
 
 国際空港の出発ゲート付近には、旅行者向けに24時間利用可能な両替カウンターが設置され、効率的なサービスが評判だ。
-
 kokusai kūkō no shuppatsu gēto fukin ni wa, ryokōsha-muke ni 24-jikan riyō kanō na ryōgae kauntā ga setchi sare, kōritsu-teki na sābisu ga hyōban da.
-
 (The departure gate area of international airports has 24-hour currency exchange counters for travelers, known for their efficient service.)"
 返事,"返事<br>Meaning: reply<br>Romaji: henji<br><br>メールが届いた際、仕事関係の内容であれば、できるだけ早く返事をすることを大切にしている人が多いといわれている。
 mēru ga todoita sai, shigoto kankei no naiyou de areba, dekiru dake hayaku henji o suru koto o taisetsu ni shite iru hito ga ooi to iwarete iru.
@@ -1229,13 +1225,10 @@ Kono resutoran no menyū wa okyaku-san no teian de kawatta koto ga aru n dayo. M
 (The menu at this restaurant has changed before based on a customer’s suggestion. Apparently, there used to be far fewer options.)"
 横断,"横断<br>Meaning: cross (more formal than wataru)<br>Romaji: oudan<br><br>この道は車が多いから、子どもと一緒に横断するときは気をつけなきゃ。
 kono michi wa kuruma ga ooi kara, kodomo to issho ni oudan suru toki wa ki o tsukenakya.
-
 (Because there are many cars on this road, you have to be careful when crossing with children.)
 
----
 駅前の大きな交差点を横断する時、信号が青でも右左をよく見てから歩いたほうがいい。
 eki-mae no ookina kousaten o oudan suru toki, shingou ga ao demo migihidari o yoku mite kara aruitahou ga ii.
-
 (When crossing the large intersection in front of the station, it's better to look both ways carefully before walking, even if the light is green.)"
 加減,"加減<br>Meaning: adjustment<br>Romaji: kagen<br><br>料理の味は火加減一つで大きく変わると言われている
 ryouri noaji wa hikagen hitotsu de ookiku kawaru to iwareteiru
@@ -7715,6 +7708,13 @@ Nihon rettō wa Taiheiyō ni ochi shi yottsu no ōkina shima o fukumu
 地震が多いこの列島では防災対策が進められている
 Jishin ga ōi kono rettō de wa bōsai taisaku ga susumerarete iru
 (In this earthquake-prone archipelago, disaster prevention measures are being advanced)"
+丘,"丘<br>Meaning: hill<br>Romaji: oka<br><br>公園の奥にある小さな丘まで登ると町が一望できるんだ
+kouen no oku ni aru chiisana oka made noboru to machi ga ichibou dekirun da
+(If you climb the small hill at the back of the park, you can get a panoramic view of the town)
+
+あの丘の上にある古い家は誰も住んでないって近所の人が言ってたよ
+ano oka no ue ni aru furui ie wa dare mo sunde nai tte kinjo no hito ga itte ta yo
+(That old house on top of the hill—someone from the neighborhood said no one lives there)"
 太平洋,"太平洋<br>Meaning: pacific ocean<br>Romaji: taiheiyou<br><br>太平洋は世界最大の海洋であり、その広大な面積は地球の表面積の約30%を占めていると言われている。
 taiheiyou wa sekai saidai no umiyou deari, sono koumou na menseki wa chikyuu no hyoumenseki no yaku 30% o shimeite iru to iwarete iru.
 (It is said that the Pacific Ocean, the largest ocean in the world, occupies about 30% of the Earth's surface area.)
