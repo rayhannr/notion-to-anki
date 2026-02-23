@@ -47,6 +47,6 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "chore: daily notion-to-anki sync [skip ci]"
+            git commit -m "chore: daily notion-to-anki sync"
             git push
           fi
